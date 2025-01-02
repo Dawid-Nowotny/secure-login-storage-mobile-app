@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { StyleSheet, TextInput, Button, View, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import axios from 'axios';
-import * as SecureStore from 'expo-secure-store';
+import { login } from './utils/api';
+import { setTokens } from './utils/secureStorage';
 
 const LoginScreen = () => {
   const [email, setEmail] = useState('');
@@ -11,24 +11,13 @@ const LoginScreen = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('http://10.0.2.2:8000/api/user/login', {
-        username: email,
-        password,
-      });
+      const response = await login(email, password);
+      await setTokens(response.access_token, response.refresh_token);
 
-      if (response.status === 200) {
-        await SecureStore.setItemAsync('access_token', response.data.access_token);
-        await SecureStore.setItemAsync('refresh_token', response.data.refresh_token);
-
-        Alert.alert('Success', 'Login successful!');
-        router.replace('/authenticated/home');
-      }
+      Alert.alert('Success', 'Login successful!');
+      router.replace('./authenticated/home');
     } catch (error: any) {
-      if (error.response && error.response.data) {
-        Alert.alert('Error', error.response.data.message || 'Login failed');
-      } else {
-        Alert.alert('Error', 'Something went wrong.');
-      }
+      Alert.alert('Error', error.response?.data?.message || 'Login failed');
     }
   };
 
@@ -50,11 +39,7 @@ const LoginScreen = () => {
         secureTextEntry
       />
       <Button title="Log In" onPress={handleLogin} />
-
-      <Button
-        title="Register"
-        onPress={() => router.push('./register')} 
-      />
+      <Button title="Register" onPress={() => router.push('./register')} />
     </View>
   );
 };

@@ -1,40 +1,40 @@
 import React, { useState } from 'react';
-import { StyleSheet, TextInput, Button, View, Alert } from 'react-native';
+import { StyleSheet, TextInput, Button, View, Alert, Text } from 'react-native';
 import { useRouter } from 'expo-router';
-import axios from 'axios';
-import * as SecureStore from 'expo-secure-store';
+import { register } from './utils/api';
+import { setTokens } from './utils/secureStorage';
 
 const RegisterScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordsMatch, setPasswordsMatch] = useState(true);
   const router = useRouter();
 
+  const handlePasswordChange = (text: string) => {
+    setPassword(text);
+    setPasswordsMatch(text === confirmPassword);
+  };
+
+  const handleConfirmPasswordChange = (text: string) => {
+    setConfirmPassword(text);
+    setPasswordsMatch(password === text);
+  };
+
   const handleRegister = async () => {
-    if (password !== confirmPassword) {
+    if (!passwordsMatch) {
       Alert.alert('Error', 'Passwords do not match');
       return;
     }
 
     try {
-      const response = await axios.post('http://10.0.2.2:8000/api/user/register', {
-        username: email,
-        password,
-      });
+      const response = await register(email, password);
+      await setTokens(response.access_token, response.refresh_token);
 
-      if (response.status === 200) {
-        await SecureStore.setItemAsync('access_token', response.data.access_token);
-        await SecureStore.setItemAsync('refresh_token', response.data.refresh_token);
-
-        Alert.alert('Success', response.data.message);
-        router.replace('./login');
-      }
+      Alert.alert('Success', response.message);
+      router.replace('/');
     } catch (error: any) {
-      if (error.response && error.response.data) {
-        Alert.alert('Error', error.response.data.message || 'Registration failed');
-      } else {
-        Alert.alert('Error', 'Something went wrong.');
-      }
+      Alert.alert('Error', error.response?.data?.message || 'Registration failed');
     }
   };
 
@@ -52,18 +52,20 @@ const RegisterScreen = () => {
         style={styles.input}
         placeholder="Password"
         value={password}
-        onChangeText={setPassword}
+        onChangeText={handlePasswordChange}
         secureTextEntry
       />
       <TextInput
         style={styles.input}
         placeholder="Confirm Password"
         value={confirmPassword}
-        onChangeText={setConfirmPassword}
+        onChangeText={handleConfirmPasswordChange}
         secureTextEntry
       />
+      {!passwordsMatch && (
+        <Text style={styles.errorText}>Passwords do not match</Text>
+      )}
       <Button title="Register" onPress={handleRegister} />
-      
     </View>
   );
 };
@@ -71,6 +73,7 @@ const RegisterScreen = () => {
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', padding: 20 },
   input: { height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 10, paddingHorizontal: 10 },
+  errorText: { color: 'red', marginBottom: 10 },
 });
 
 export default RegisterScreen;
