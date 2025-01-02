@@ -1,5 +1,6 @@
-from src.models import User
 from fastapi_jwt_auth import AuthJWT
+
+from src.models import User
 
 class JWTService:
     def create_tokens(self, user: User, auth: AuthJWT, message: str) -> dict:

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from fastapi_jwt_auth import AuthJWT
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -21,8 +21,12 @@ class Settings(BaseModel):
 def get_config():
     return Settings()
 
-@router.post("/register", response_model=TokenResponseScheme)
-def register(register_scheme: RegisterScheme, auth: AuthJWT = Depends(), db: Session = Depends(get_db)):
+@router.post("/register", response_model=TokenResponseScheme, status_code=status.HTTP_201_CREATED)
+def register(
+    register_scheme: RegisterScheme, 
+    auth: AuthJWT = Depends(), 
+    db: Session = Depends(get_db)
+):
     user_service = UserService()
     jwt_service = JWTService()
     user_service.check_if_user_exists(register_scheme.username, db)
@@ -33,7 +37,11 @@ def register(register_scheme: RegisterScheme, auth: AuthJWT = Depends(), db: Ses
     return tokens
 
 @router.post("/login", response_model=TokenResponseScheme)
-def login(login_scheme: LoginScheme, auth: AuthJWT = Depends(), db: Session = Depends(get_db)):
+def login(
+    login_scheme: LoginScheme, 
+    auth: AuthJWT = Depends(), 
+    db: Session = Depends(get_db)
+):
     user_service = UserService()
     jwt_service = JWTService()
 
