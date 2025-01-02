@@ -51,7 +51,8 @@ class Account(Base):
     user_id = Column(Integer, ForeignKey('User.id'), nullable=False)
     owner: Mapped["User"] = relationship(back_populates="accounts")
 
-    def encrypt_password(self, password: str, key: bytes) -> bytes:
+    @staticmethod
+    def encrypt_password(password: str, key: bytes) -> bytes:
         iv = os.urandom(16)
         cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
         encryptor = cipher.encryptor()
