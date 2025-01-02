@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from src.routers import auth
+
 app = FastAPI()
 
 origins = [
@@ -15,6 +17,4 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
+app.include_router(auth.router, prefix="/api/user", tags=["User"])
