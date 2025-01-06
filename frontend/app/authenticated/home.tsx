@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, TextInput, Button, View, Alert } from 'react-native';
+import { StyleSheet, TextInput, TouchableOpacity, Text, View, Alert } from 'react-native';
 import { Credential } from '../models/Credential';
 import { loadCredentials, saveCredentials } from '../utils/secureStorage';
 
@@ -37,28 +37,75 @@ const Home = () => {
         placeholder="Platform Name"
         value={platformName}
         onChangeText={setPlatformName}
+        placeholderTextColor="#aaa" 
       />
       <TextInput
         style={styles.input}
         placeholder="Username"
         value={username}
         onChangeText={setUsername}
+        placeholderTextColor="#aaa" 
       />
       <TextInput
         style={styles.input}
         placeholder="Password"
         value={password}
         onChangeText={setPassword}
+        placeholderTextColor="#aaa" 
         secureTextEntry
       />
-      <Button title="Add Credential" onPress={addCredential} />
+      <TouchableOpacity onPress={addCredential} style={styles.button}>
+        <Text style={styles.buttonText}>Add Credential</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { padding: 20 },
-  input: { height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 10, paddingHorizontal: 10 },
+  container: { 
+    flex: 1, 
+    padding: 20, 
+    backgroundColor: '#141414' 
+  },
+  input: { 
+    color: '#fff', 
+    borderRadius: 5, 
+    borderColor: '#ffdd00', 
+    backgroundColor: '#202020', 
+    fontSize: 20,
+    borderWidth: 2, 
+    marginBottom: 10, 
+    paddingHorizontal: 10 
+  },
+  button: {
+    backgroundColor: '#ffdd00', 
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#222', 
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    textAlign: 'center',
+    fontSize: 20,
+  },
+  logoText1: {
+    color: '#ffdd00', 
+    fontSize: 39,
+    fontWeight: '500',
+    textTransform: 'uppercase',
+    textAlign: 'center',
+  },
+  logoText2: {
+    color: '#ffdd00', 
+    fontSize: 39,
+    fontWeight: '500',
+    textTransform: 'uppercase',
+    textAlign: 'center',
+    marginBottom: 150, 
+  },
 });
 
 export default Home;

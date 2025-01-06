@@ -1,8 +1,8 @@
 import React from 'react';
-import { StyleSheet, Button, View, Alert, Text } from 'react-native';
+import { StyleSheet, TouchableOpacity, View, Alert, Text } from 'react-native';
 import { Credential } from '../models/Credential';
 import { useRouter } from 'expo-router';
-import { clearTokens , clearCredentials} from '../utils/secureStorage';
+import { clearTokens, clearCredentials } from '../utils/secureStorage';
 
 const OptionsScreen = ({ credentials }: { credentials: Credential[] }) => {
   const router = useRouter();
@@ -12,8 +12,6 @@ const OptionsScreen = ({ credentials }: { credentials: Credential[] }) => {
     router.replace('/');
   };
 
-
-  
   const handleDelete = async () => {
     try {
       await clearCredentials(); 
@@ -45,38 +43,68 @@ const OptionsScreen = ({ credentials }: { credentials: Credential[] }) => {
 
   return (
     <View style={styles.container}>
-      <Button title="Sync with Backend" onPress={syncWithBackend} />
-      <View style={{ height: 10 }} />
+      <TouchableOpacity onPress={syncWithBackend} style={styles.button}>
+        <Text style={styles.buttonText}>Sync with Backend</Text>
+      </TouchableOpacity>
+
       <View style={styles.textBox}>
         <Text style={styles.text}>All your credentials are saved on this device.</Text>
         <Text style={styles.text}>You can remove your credentials from the device before logging out.</Text>
         <Text style={styles.text}>If you have synchronized them with the server,</Text>
         <Text style={styles.text}>you will have the option to restore them.</Text>
       </View>
-      <View style={{ height: 10 }} />
-      <Button title="Delete credentials" onPress={handleDelete} />
-      <View style={{ height: 10 }} />
-      <Button title="Logout" onPress={handleLogout} />
+
+      <TouchableOpacity onPress={handleDelete} style={[styles.button, styles.deleteButton]}>
+        <Text style={styles.buttonText}>Delete Credentials</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={handleLogout} style={[styles.button, styles.logoutButton]}>
+        <Text style={styles.buttonText}>Logout</Text>
+      </TouchableOpacity>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  item: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  container: { 
+    flex: 1, 
+    padding: 20, 
+    backgroundColor: '#141414' 
   },
-  input: { height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 10, paddingHorizontal: 10 },
-  textBox: {  borderColor: 'gray', borderWidth: 1, paddingHorizontal: 10, paddingVertical: 10  },
-  info: { flex: 1 },
-  text: { fontSize: 16, textAlign: 'center'},
-  emptyText: { textAlign: 'center', marginTop: 20, fontSize: 18, color: 'gray' },
-  container: { padding: 20 },
+  textBox: {  
+    borderColor: '#ffdd00', 
+    borderWidth: 2, 
+    paddingHorizontal: 10, 
+    paddingVertical: 10,
+    marginVertical: 20,
+    backgroundColor: '#202020',
+    borderRadius: 5,
+  },
+  text: { 
+    fontSize: 16, 
+    color: '#fff', 
+    textAlign: 'center',
+  },
+  button: {
+    backgroundColor: '#ffdd00', 
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginVertical: 5,
+  },
+  buttonText: {
+    color: '#222', 
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    fontSize: 18,
+  },
+  deleteButton: {
+    backgroundColor: '#ff4444',
+  },
+  logoutButton: {
+    backgroundColor: '#ffdd00',
+  },
 });
-
 
 export default OptionsScreen;

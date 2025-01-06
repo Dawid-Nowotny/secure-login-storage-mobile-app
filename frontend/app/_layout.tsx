@@ -4,8 +4,8 @@ import { Stack } from 'expo-router';
 const RootLayout = () => {
   return (
     <Stack>
-      <Stack.Screen name="index" options={{ title: 'Login' }} />
-      <Stack.Screen name="register" options={{ title: 'Register' }} />
+      <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="register" options={{ headerShown: false }} />
       <Stack.Screen name="authenticated" options={{ headerShown: false }} />
     </Stack>
   );
