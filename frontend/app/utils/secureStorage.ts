@@ -12,6 +12,14 @@ export const saveCredentials = async (credentials: Credential[]): Promise<void> 
   await SecureStore.setItemAsync(STORAGE_KEY, JSON.stringify(credentials));
 };
 
+export const clearCredentials = async () => {
+  try {
+    await SecureStore.deleteItemAsync('credentials');
+  } catch (error) {
+    throw new Error('Failed to clear credentials');
+  }
+};
+
 export const setTokens = async (accessToken: string, refreshToken: string): Promise<void> => {
   await SecureStore.setItemAsync('access_token', accessToken);
   await SecureStore.setItemAsync('refresh_token', refreshToken);

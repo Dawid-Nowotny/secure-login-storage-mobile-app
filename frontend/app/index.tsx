@@ -39,6 +39,7 @@ const LoginScreen = () => {
         secureTextEntry
       />
       <Button title="Log In" onPress={handleLogin} />
+      <View style={{ height: 20 }} />
       <Button title="Register" onPress={() => router.push('./register')} />
     </View>
   );

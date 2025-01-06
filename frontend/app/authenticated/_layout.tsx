@@ -25,9 +25,9 @@ const AuthenticatedLayout = () => {
 
   return (
     <Tabs>
-      <Tabs.Screen name="home" options={{ title: 'Home' }} />
-      <Tabs.Screen name="profile" options={{ title: 'Profile' }} />
-      <Tabs.Screen name="settings" options={{ title: 'Settings' }} />
+      <Tabs.Screen name="home" options={{ title: 'Add credential' }} />
+      <Tabs.Screen name="credentialList" options={{ title: 'Credential list' }} />
+      <Tabs.Screen name="options" options={{ title: 'Options' }} />
     </Tabs>
   );
 };
