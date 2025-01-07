@@ -1,22 +1,22 @@
 import * as SecureStore from 'expo-secure-store';
-import { Credential } from '../models/Credential';
+import { Account } from '../models/Account';
 
-const STORAGE_KEY = 'credentials';
+const STORAGE_KEY = 'accounts';
 
-export const loadCredentials = async (): Promise<Credential[]> => {
-  const storedCredentials = await SecureStore.getItemAsync(STORAGE_KEY);
-  return storedCredentials ? JSON.parse(storedCredentials) : [];
+export const loadAccounts= async (): Promise<Account[]> => {
+  const storedAccounts = await SecureStore.getItemAsync(STORAGE_KEY);
+  return storedAccounts ? JSON.parse(storedAccounts) : [];
 };
 
-export const saveCredentials = async (credentials: Credential[]): Promise<void> => {
-  await SecureStore.setItemAsync(STORAGE_KEY, JSON.stringify(credentials));
+export const saveAccounts = async (accounts: Account[]): Promise<void> => {
+  await SecureStore.setItemAsync(STORAGE_KEY, JSON.stringify(accounts));
 };
 
-export const clearCredentials = async () => {
+export const clearAccounts = async () => {
   try {
-    await SecureStore.deleteItemAsync('credentials');
+    await SecureStore.deleteItemAsync('accounts');
   } catch (error) {
-    throw new Error('Failed to clear credentials');
+    throw new Error('Failed to clear accounts');
   }
 };
 

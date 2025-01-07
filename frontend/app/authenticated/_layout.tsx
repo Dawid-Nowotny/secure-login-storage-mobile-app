@@ -41,14 +41,14 @@ const AuthenticatedLayout = () => {
       <Tabs.Screen 
         name="home" 
         options={{ 
-          title: 'Add credential',
+          title: 'Add account',
           tabBarIcon: ({ color }) => <Ionicons name="add-circle-outline" size={24} color={color} /> 
         }} 
       />
       <Tabs.Screen 
-        name="credentialList" 
+        name="accountList" 
         options={{ 
-          title: 'Credential list',
+          title: 'Account list',
           tabBarIcon: ({ color }) => <Ionicons name="list-outline" size={24} color={color} /> 
         }} 
       />

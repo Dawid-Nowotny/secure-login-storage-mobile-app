@@ -1,10 +1,10 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View, Alert, Text } from 'react-native';
-import { Credential } from '../models/Credential';
+import { Account } from '../models/Account';
 import { useRouter } from 'expo-router';
-import { clearTokens, clearCredentials } from '../utils/secureStorage';
+import { clearTokens, clearAccounts} from '../utils/secureStorage';
 
-const OptionsScreen = ({ credentials }: { credentials: Credential[] }) => {
+const OptionsScreen = ({ accounts }: { accounts: Account[] }) => {
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -14,10 +14,10 @@ const OptionsScreen = ({ credentials }: { credentials: Credential[] }) => {
 
   const handleDelete = async () => {
     try {
-      await clearCredentials(); 
-      Alert.alert('Success', 'All credentials have been deleted');
+      await clearAccounts(); 
+      Alert.alert('Success', 'All accounts have been deleted');
     } catch (error) {
-      Alert.alert('Error', 'Failed to delete credentials');
+      Alert.alert('Error', 'Failed to delete accounts');
     }
   };
 
@@ -28,11 +28,11 @@ const OptionsScreen = ({ credentials }: { credentials: Credential[] }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(credentials),
+        body: JSON.stringify(accounts),
       });
 
       if (response.ok) {
-        Alert.alert('Success', 'Credentials synchronized with the backend');
+        Alert.alert('Success', 'Accounts synchronized with the backend');
       } else {
         Alert.alert('Error', 'Failed to sync with backend');
       }
@@ -48,14 +48,14 @@ const OptionsScreen = ({ credentials }: { credentials: Credential[] }) => {
       </TouchableOpacity>
 
       <View style={styles.textBox}>
-        <Text style={styles.text}>All your credentials are saved on this device.</Text>
-        <Text style={styles.text}>You can remove your credentials from the device before logging out.</Text>
+        <Text style={styles.text}>All your accounts are saved on this device.</Text>
+        <Text style={styles.text}>You can remove your accounts from the device before logging out.</Text>
         <Text style={styles.text}>If you have synchronized them with the server,</Text>
         <Text style={styles.text}>you will have the option to restore them.</Text>
       </View>
 
       <TouchableOpacity onPress={handleDelete} style={[styles.button, styles.deleteButton]}>
-        <Text style={styles.buttonText}>Delete Credentials</Text>
+        <Text style={styles.buttonText}>Delete Accounts</Text>
       </TouchableOpacity>
 
       <TouchableOpacity onPress={handleLogout} style={[styles.button, styles.logoutButton]}>
