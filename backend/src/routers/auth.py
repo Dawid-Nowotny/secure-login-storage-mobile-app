@@ -3,6 +3,8 @@ from fastapi_jwt_auth import AuthJWT
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
+import datetime
+
 from src.services.user_service import UserService
 from src.services.jwt_service import JWTService
 
@@ -51,3 +53,11 @@ def login(
     tokens = jwt_service.create_tokens(user, auth, "Login successful")
 
     return tokens
+
+@router.post('/refresh')
+def refresh(Authorize: AuthJWT = Depends()):
+    Authorize.jwt_refresh_token_required()
+
+    current_user = Authorize.get_jwt_subject()
+    new_access_token = Authorize.create_access_token(subject=current_user, expires_time=datetime.timedelta(seconds=300))
+    return {"access_token": new_access_token}

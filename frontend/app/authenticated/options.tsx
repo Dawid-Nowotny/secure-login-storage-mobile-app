@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { StyleSheet, TouchableOpacity, View, Text, Modal } from 'react-native';
 import { Account } from '../models/Account';
 import { BackendAccount } from '../models/BackendAccount';
@@ -34,23 +35,25 @@ const OptionsScreen = () => {
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
 
-  useEffect(() => {
-    const fetchAccounts = async () => {
-      try {
-        const storedAccounts = await loadAccounts();
-        setAccounts(storedAccounts || []);
-      } catch (error) {
-        setAlertMessage('Failed to load accounts');
-        setAlertVisible(true);
-      }
-    };
-
-    fetchAccounts();
-  }, []);
+  useFocusEffect(
+      React.useCallback(() => {
+        const fetchAccounts = async () => {
+          try {
+            const storedAccounts = await loadAccounts();
+            setAccounts(storedAccounts || []);
+          } catch (error) {
+            setAlertMessage('Failed to load accounts');
+            setAlertVisible(true);
+          }
+        };
+  
+        fetchAccounts();
+      }, [])
+    );
 
   const handleLogout = async () => {
     await clearTokens();
-    router.replace('./');
+    router.replace('/');
   };
 
   const handleDelete = async () => {
@@ -82,7 +85,6 @@ const OptionsScreen = () => {
 
       await syncAccounts(formattedAccounts, token);
   
-      console.log('Synchronized accounts:', formattedAccounts); 
       setAlertMessage('Accounts synchronized with the backend');
       setAlertVisible(true);
     } catch (error: any) {
