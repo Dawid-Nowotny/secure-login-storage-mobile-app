@@ -33,6 +33,12 @@ export const getRefreshToken = async (): Promise<string | null> => {
   return await SecureStore.getItemAsync('refresh_token');
 };
 
+export const getTokens = async () => {
+  const accessToken = await SecureStore.getItemAsync('access_token');
+  const refreshToken = await SecureStore.getItemAsync('refresh_token');
+  return { access_token: accessToken, refresh_token: refreshToken };
+};
+
 export const clearTokens = async (): Promise<void> => {
   await SecureStore.deleteItemAsync('access_token');
   await SecureStore.deleteItemAsync('refresh_token');
