@@ -1,11 +1,36 @@
-import React from 'react';
-import { StyleSheet, TouchableOpacity, View, Alert, Text } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, TouchableOpacity, View, Text, Modal } from 'react-native';
 import { Account } from '../models/Account';
 import { useRouter } from 'expo-router';
-import { clearTokens, clearAccounts} from '../utils/secureStorage';
+import { clearTokens, clearAccounts } from '../utils/secureStorage';
+import { syncAccounts } from '../utils/api'; 
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
+interface CustomAlertProps {
+  visible: boolean;
+  message: string;
+  onClose: () => void;
+}
+
+const CustomAlert: React.FC<CustomAlertProps> = ({ visible, message, onClose }) => {
+  return (
+    <Modal transparent={true} visible={visible} animationType="slide">
+      <View style={styles.modalBackground}>
+        <View style={styles.modalContainer}>
+          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <Ionicons name="close" size={24} color="#ffdd00" />
+          </TouchableOpacity>
+          <Text style={styles.modalTitle}>{message}</Text>
+        </View>
+      </View>
+    </Modal>
+  );
+};
 
 const OptionsScreen = ({ accounts }: { accounts: Account[] }) => {
   const router = useRouter();
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
 
   const handleLogout = async () => {
     await clearTokens();
@@ -14,30 +39,23 @@ const OptionsScreen = ({ accounts }: { accounts: Account[] }) => {
 
   const handleDelete = async () => {
     try {
-      await clearAccounts(); 
-      Alert.alert('Success', 'All accounts have been deleted');
+      await clearAccounts();
+      setAlertMessage('All accounts have been deleted');
+      setAlertVisible(true);
     } catch (error) {
-      Alert.alert('Error', 'Failed to delete accounts');
+      setAlertMessage('Failed to delete accounts');
+      setAlertVisible(true);
     }
   };
 
   const syncWithBackend = async () => {
     try {
-      const response = await fetch('http://10.0.2.2:8000/api/sync', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(accounts),
-      });
-
-      if (response.ok) {
-        Alert.alert('Success', 'Accounts synchronized with the backend');
-      } else {
-        Alert.alert('Error', 'Failed to sync with backend');
-      }
+      await syncAccounts(accounts); 
+      setAlertMessage('Accounts synchronized with the backend');
+      setAlertVisible(true);
     } catch (error) {
-      Alert.alert('Error', 'Something went wrong while syncing');
+      setAlertMessage('Something went wrong while syncing');
+      setAlertVisible(true);
     }
   };
 
@@ -58,9 +76,11 @@ const OptionsScreen = ({ accounts }: { accounts: Account[] }) => {
         <Text style={styles.buttonText}>Delete Accounts</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={handleLogout} style={[styles.button, styles.logoutButton]}>
+      <TouchableOpacity onPress={handleLogout} style={[styles.button]}>
         <Text style={styles.buttonText}>Logout</Text>
       </TouchableOpacity>
+
+      <CustomAlert visible={alertVisible} message={alertMessage} onClose={() => setAlertVisible(false)} />
     </View>
   );
 };
@@ -102,9 +122,31 @@ const styles = StyleSheet.create({
   deleteButton: {
     backgroundColor: '#ff4444',
   },
-  logoutButton: {
-    backgroundColor: '#ffdd00',
-  },
+   modalBackground: {
+     flex: 1,
+     justifyContent: 'center',
+     alignItems: 'center',
+     backgroundColor: 'rgba(0,0,0,0.5)',
+   },
+   modalContainer: {
+     width: '80%',
+     paddingVertical: 40,
+     paddingHorizontal: 30,
+     backgroundColor: '#202020',
+     borderRadius: 10,
+     alignItems: 'flex-start', 
+   },
+   closeButton: {
+     position: 'absolute', 
+     right: 10,
+     top: 10,
+   },
+   modalTitle: {
+     color: '#fff',
+     fontSize: 20,
+     fontWeight: 'bold',
+     marginBottom: 15,
+   },
 });
 
 export default OptionsScreen;
