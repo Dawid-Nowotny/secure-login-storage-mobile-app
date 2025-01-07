@@ -50,7 +50,7 @@ const OptionsScreen = () => {
 
   const handleLogout = async () => {
     await clearTokens();
-    router.replace('/');
+    router.replace('./');
   };
 
   const handleDelete = async () => {

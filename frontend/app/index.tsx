@@ -3,6 +3,7 @@ import { StyleSheet, TextInput, TouchableOpacity, Text, View, Modal } from 'reac
 import { useRouter } from 'expo-router';
 import { login } from './utils/api';
 import { setTokens } from './utils/secureStorage';
+import AuthenticationScreen from './authenticationScreen'; 
 import Ionicons from 'react-native-vector-icons/Ionicons'; 
 
 interface CustomAlertProps {
@@ -32,6 +33,11 @@ const LoginScreen = () => {
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const router = useRouter();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const handleAuthentication = () => {
+    setIsAuthenticated(true);
+  };
   
 
   const handleLogin = async () => {
@@ -55,35 +61,41 @@ const LoginScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.logoText1}>Secure Login</Text>
-      <Text style={styles.logoText2}>Storage</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-        placeholderTextColor="#aaa"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        placeholderTextColor="#aaa"
-      />
-      <TouchableOpacity onPress={handleLogin} style={styles.button}>
-        <Text style={styles.buttonText}>Log In</Text>
-      </TouchableOpacity>
-      <View style={{ height: 10 }} />
-      
-      <TouchableOpacity onPress={() => router.push('./register')} style={styles.button}>
-        <Text style={styles.buttonText}>Register</Text>
-      </TouchableOpacity>
+    {isAuthenticated ? (
+      <View>
+        <Text style={styles.logoText1}>Secure Login</Text>
+        <Text style={styles.logoText2}>Storage</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          placeholderTextColor="#aaa"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          placeholderTextColor="#aaa"
+        />
+        <TouchableOpacity onPress={handleLogin} style={styles.button}>
+          <Text style={styles.buttonText}>Log In</Text>
+        </TouchableOpacity>
+        <View style={{ height: 10 }} />
+        
+        <TouchableOpacity onPress={() => router.push('./register')} style={styles.button}>
+          <Text style={styles.buttonText}>Register</Text>
+        </TouchableOpacity>
 
-      <CustomAlert visible={alertVisible} message={alertMessage} onClose={() => setAlertVisible(false)} />
+        <CustomAlert visible={alertVisible} message={alertMessage} onClose={() => setAlertVisible(false)} />
+      </View>
+    ) : (
+      <AuthenticationScreen onAuthenticated={handleAuthentication} />
+    )}
     </View>
   );
 };
