@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, TouchableOpacity, View, Text, Modal } from 'react-native';
 import { Account } from '../models/Account';
+import { BackendAccount } from '../models/BackendAccount';
 import { useRouter } from 'expo-router';
-import { clearTokens, clearAccounts } from '../utils/secureStorage';
-import { syncAccounts } from '../utils/api'; 
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { clearTokens, clearAccounts, getAccessToken, loadAccounts, saveAccounts } from '../utils/secureStorage';
+import { syncAccounts, fetchAccounts } from '../utils/api';
+import Ionicons from 'react-native-vector-icons/Ionicons'; 
 
 interface CustomAlertProps {
   visible: boolean;
@@ -27,10 +28,25 @@ const CustomAlert: React.FC<CustomAlertProps> = ({ visible, message, onClose }) 
   );
 };
 
-const OptionsScreen = ({ accounts }: { accounts: Account[] }) => {
+const OptionsScreen = () => {
   const router = useRouter();
+  const [accounts, setAccounts] = useState<Account[]>([]);
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
+
+  useEffect(() => {
+    const fetchAccounts = async () => {
+      try {
+        const storedAccounts = await loadAccounts();
+        setAccounts(storedAccounts || []);
+      } catch (error) {
+        setAlertMessage('Failed to load accounts');
+        setAlertVisible(true);
+      }
+    };
+
+    fetchAccounts();
+  }, []);
 
   const handleLogout = async () => {
     await clearTokens();
@@ -40,6 +56,7 @@ const OptionsScreen = ({ accounts }: { accounts: Account[] }) => {
   const handleDelete = async () => {
     try {
       await clearAccounts();
+      setAccounts([]);
       setAlertMessage('All accounts have been deleted');
       setAlertVisible(true);
     } catch (error) {
@@ -50,11 +67,54 @@ const OptionsScreen = ({ accounts }: { accounts: Account[] }) => {
 
   const syncWithBackend = async () => {
     try {
-      await syncAccounts(accounts); 
+      const token = await getAccessToken();
+      if (!token) {
+        setAlertMessage('You are not authorized to sync accounts');
+        setAlertVisible(true);
+        return;
+      }
+
+      const formattedAccounts: BackendAccount[] = accounts.map(account => ({
+        platform_name: account.platform_name,
+        username: account.username,
+        password_encrypted: account.password, 
+      }));
+
+      await syncAccounts(formattedAccounts, token);
+  
+      console.log('Synchronized accounts:', formattedAccounts); 
       setAlertMessage('Accounts synchronized with the backend');
       setAlertVisible(true);
-    } catch (error) {
-      setAlertMessage('Something went wrong while syncing');
+    } catch (error: any) {
+      setAlertMessage(error.message || 'Something went wrong while syncing');
+      setAlertVisible(true);
+    }
+  };
+
+  const fetchAccountsFromBackend = async () => {
+    try {
+      const token = await getAccessToken();
+      if (!token) {
+        setAlertMessage('You are not authorized to fetch accounts');
+        setAlertVisible(true);
+        return;
+      }
+  
+      const fetchedAccounts = await fetchAccounts(token);
+
+      const formattedAccounts: Account[] = fetchedAccounts.map(account => ({
+        platform_name: account.platform_name,
+        username: account.username,
+        password: account.password_encrypted, 
+      }));
+  
+      await saveAccounts(formattedAccounts);
+      setAccounts(formattedAccounts);
+  
+      setAlertMessage('Accounts successfully fetched and updated');
+      setAlertVisible(true);
+    } catch (error: any) {
+      setAlertMessage(error.message || 'Something went wrong while fetching accounts');
       setAlertVisible(true);
     }
   };
@@ -63,6 +123,9 @@ const OptionsScreen = ({ accounts }: { accounts: Account[] }) => {
     <View style={styles.container}>
       <TouchableOpacity onPress={syncWithBackend} style={styles.button}>
         <Text style={styles.buttonText}>Sync with Backend</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={fetchAccountsFromBackend} style={styles.button}>
+        <Text style={styles.buttonText}>Fetch Accounts from Backend</Text>
       </TouchableOpacity>
 
       <View style={styles.textBox}>
