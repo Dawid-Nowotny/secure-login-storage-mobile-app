@@ -14,9 +14,17 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCalendarsUsageDescription": "Aplikacja potrzebuje dostępu do Twojego kalendarza, aby wyświetlać wydarzenia i zarządzać nimi.",
+        "NSRemindersUsageDescription": "Aplikacja potrzebuje dostępu do Twoich przypomnień w celu ich synchronizacji z kalendarzem."
+      }
     },
     "android": {
+      "permissions": [
+        "READ_CALENDAR",
+        "WRITE_CALENDAR"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
